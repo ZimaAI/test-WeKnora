@@ -1,0 +1,17 @@
+# Build the current checkout for personal development; reuse the weknora volumes.
+# Run with scripts/update-local.ps1 from PowerShell.
+services:
+  app:
+    image: weknora-local/app:${LOCAL_IMAGE_TAG:-dev}
+    build:
+      args:
+        VERSION_ARG: ${LOCAL_VERSION:-dev}
+        COMMIT_ID_ARG: ${LOCAL_COMMIT:-unknown}
+        BUILD_TIME_ARG: ${LOCAL_BUILD_TIME:-unknown}
+  frontend:
+    image: weknora-local/frontend:${LOCAL_IMAGE_TAG:-dev}
+    build:
+      args:
+        VITE_FRONTEND_COMMIT: ${LOCAL_COMMIT:-unknown}
+  docreader:
+    image: weknora-local/docreader:${LOCAL_IMAGE_TAG:-dev}

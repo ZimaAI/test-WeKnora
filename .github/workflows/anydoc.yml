@@ -5,19 +5,6 @@ name: Anydoc
 # off PRs that only touch migrations, frontend, CLI, or unrelated Go packages.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "third_party/anydoc-go/**"
-      - "scripts/build-anydoc-lib.sh"
-      - "internal/infrastructure/docparser/**"
-      - ".github/workflows/anydoc.yml"
-  pull_request:
-    paths:
-      - "third_party/anydoc-go/**"
-      - "scripts/build-anydoc-lib.sh"
-      - "internal/infrastructure/docparser/**"
-      - ".github/workflows/anydoc.yml"
   workflow_dispatch:
 
 concurrency:

@@ -7,23 +7,12 @@ name: Build & Publish (mcp-server)
 # Release policy: publishing does NOT depend on tags. Bump the version in
 # mcp-server/pyproject.toml (and the synced version strings in setup.py,
 # __init__.py, weknora_mcp_server.py server_version, main.py --version),
-# merge to main, and the pipeline builds + publishes automatically.
+# then manually dispatch this workflow on main to build and publish.
 # A pre-publish check queries PyPI and skips upload if that version is
 # already published, so re-running on an unchanged version stays green.
-# Releases also still trigger on mcp-server-v* tags (back-compat).
+# Manual dispatch on mcp-server-v* tags can also publish releases.
 
 on:
-  push:
-    branches: [main]
-    tags:
-      - "mcp-server-v*"
-    paths:
-      - "mcp-server/**"
-      - ".github/workflows/mcp-server.yml"
-  pull_request:
-    paths:
-      - "mcp-server/**"
-      - ".github/workflows/mcp-server.yml"
   workflow_dispatch:
 
 permissions:
@@ -61,7 +50,7 @@ jobs:
     name: Build sdist + wheel
     needs: test
     runs-on: ubuntu-latest
-    # Build on push to main, manual runs, and release tags — but never on PRs.
+    # Build during manual runs.
     if: github.event_name != 'pull_request'
     defaults:
       run:

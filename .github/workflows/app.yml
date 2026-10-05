@@ -4,63 +4,6 @@ name: App
 # migrations-only or unrelated Go PR does not compile the parser engine.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "**/*.go"
-      - "!cli/**"
-      - "!client/**"
-      - "!docreader/**"
-      - "!third_party/anydoc-go/**"
-      - "go.mod"
-      - "go.sum"
-      - "Makefile"
-      - "config/**"
-      - "migrations/**"
-      - "skills/preloaded/**"
-      - "testdata/**"
-      - "docker/Dockerfile.app"
-      - "LICENSE"
-      - "THIRD_PARTY_NOTICES.md"
-      - "licenses/**"
-      - "internal/textconv/data/**"
-      - "internal/models/catalog/data/**"
-      - "internal/models/parity/testdata/**"
-      - "internal/models/providers/assets/**"
-      - "scripts/model-catalog/**"
-      - "scripts/*license*.sh"
-      - "scripts/git-hooks/**"
-      - "scripts/test-git-hooks.sh"
-      - "cmd/desktop/build/windows/installer/project.nsi"
-      - ".github/workflows/app.yml"
-  pull_request:
-    paths:
-      - "**/*.go"
-      - "!cli/**"
-      - "!client/**"
-      - "!docreader/**"
-      - "!third_party/anydoc-go/**"
-      - "go.mod"
-      - "go.sum"
-      - "Makefile"
-      - "config/**"
-      - "migrations/**"
-      - "skills/preloaded/**"
-      - "testdata/**"
-      - "docker/Dockerfile.app"
-      - "LICENSE"
-      - "THIRD_PARTY_NOTICES.md"
-      - "licenses/**"
-      - "internal/textconv/data/**"
-      - "internal/models/catalog/data/**"
-      - "internal/models/parity/testdata/**"
-      - "internal/models/providers/assets/**"
-      - "scripts/model-catalog/**"
-      - "scripts/*license*.sh"
-      - "scripts/git-hooks/**"
-      - "scripts/test-git-hooks.sh"
-      - "cmd/desktop/build/windows/installer/project.nsi"
-      - ".github/workflows/app.yml"
   workflow_dispatch:
 
 concurrency:

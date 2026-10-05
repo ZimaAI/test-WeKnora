@@ -1,27 +1,15 @@
 name: Go Lint
 
-# The repository carries a large backlog of pre-existing golangci-lint findings,
-# so pull requests are only judged on the code they introduce. The filter needs
-# a pull request diff, which is why this workflow has no other trigger; the
-# companion go-lint-cache.yml keeps the caches this job restores from warm on
-# main.
-#
-# The filter is golangci-lint's own `--new-from-merge-base` rather than the
-# action's `only-new-issues`, because that option asks the GitHub API for the
-# pull request patch and the API refuses any diff over 20000 lines
-# ("code": "too_large"). On a large pull request the action silently falls back
-# to linting everything, which reports the entire backlog and can never pass.
-# Computing the merge base from git has no size limit, and `fetch-depth: 0`
-# below is what makes the base commit available to do it.
-
+# Manually lint changes against a selected base (the previous commit by default).
+# Existing lint findings outside the diff are excluded.
 on:
-  pull_request:
-    paths:
-      - "**/*.go"
-      - "**/go.mod"
-      - "**/go.sum"
-      - ".golangci.yml"
-      - ".github/workflows/go-lint.yml"
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: "Git base ref to compare against (e.g. HEAD~1 or a commit SHA)"
+        required: true
+        default: "HEAD~1"
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,16 +24,13 @@ env:
   GOPROXY: https://proxy.golang.org,direct
 
 jobs:
-  # Path filters above start this workflow for any Go change; the matrix still
-  # used to lint all three modules. Detect which modules the PR actually
-  # touches so a root-only change (migrations test, handler, …) does not queue
-  # cli/ and client/ runners. Changing .golangci.yml or this workflow still
-  # lints every module, since they share the root config.
+  # Only lint modules changed since the selected base.
   changes:
     name: detect lint modules
     runs-on: ubuntu-latest
     outputs:
       modules: ${{ steps.detect.outputs.modules }}
+      base_sha: ${{ steps.detect.outputs.base_sha }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -53,8 +38,12 @@ jobs:
       - name: Detect changed modules
         id: detect
         shell: bash
+        env:
+          BASE_REF: ${{ inputs.base_ref }}
         run: |
-          diff_range="${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
+          base_sha=$(git rev-parse --verify --end-of-options "${BASE_REF}^{commit}")
+          echo "base_sha=${base_sha}" >> "$GITHUB_OUTPUT"
+          diff_range="${base_sha}...${GITHUB_SHA}"
           modules=()
           if git diff --name-only --diff-filter=ACMR "$diff_range" -- \
                .golangci.yml .github/workflows/go-lint.yml | grep -q .; then
@@ -109,7 +98,6 @@ jobs:
         with:
           version: ${{ env.GOLANGCI_LINT_VERSION }}
           working-directory: ${{ matrix.module }}
-          # Deliberately off: see the note at the top of this file. The same
-          # filtering is done below, from git.
+          # Filter from git using the verified base commit.
           only-new-issues: false
-          args: --new-from-merge-base=${{ github.event.pull_request.base.sha }}
+          args: --new-from-merge-base=${{ needs.changes.outputs.base_sha }}

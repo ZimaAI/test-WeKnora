@@ -10,14 +10,6 @@ name: Go Lint Cache
 # GitHub renders its name with the matrix expression unexpanded.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "**/*.go"
-      - "**/go.mod"
-      - "**/go.sum"
-      - ".golangci.yml"
-      - ".github/workflows/go-lint-cache.yml"
   workflow_dispatch:
 
 concurrency:

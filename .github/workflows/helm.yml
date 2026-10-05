@@ -1,16 +1,7 @@
 name: Helm
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "helm/**"
-      - ".github/workflows/helm.yml"
-  pull_request:
-    paths:
-      - "helm/**"
-      - ".github/workflows/helm.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
