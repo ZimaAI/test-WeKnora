@@ -24,8 +24,12 @@ try {
     $composeArgs = @('compose', '-p', 'weknora', '-f', 'docker-compose.yml', '-f', 'docker-compose.local.yml')
     docker @composeArgs config --quiet
     if ($LASTEXITCODE -ne 0) { throw 'Compose configuration is invalid.' }
-    docker @composeArgs build app frontend docreader
-    if ($LASTEXITCODE -ne 0) { throw 'Image build failed; running containers have not been replaced.' }
+    # Build one service at a time to limit Docker Desktop memory/CPU contention.
+    # Completed images remain cached if a later service fails to build.
+    foreach ($service in @('frontend', 'docreader', 'app')) {
+        docker @composeArgs build $service
+        if ($LASTEXITCODE -ne 0) { throw "Image build failed for ${service}; running containers have not been replaced." }
+    }
     docker @composeArgs up -d --no-build --wait --wait-timeout 180 app frontend docreader postgres redis
     if ($LASTEXITCODE -ne 0) { throw 'Deployment failed; inspect docker compose logs.' }
     docker @composeArgs ps
