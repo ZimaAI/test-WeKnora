@@ -1,5 +1,11 @@
 *.sh text eol=lf
 
+# Linux image builds parse these manifests with shell read/awk. CRLF leaves
+# trailing carriage returns in checksums and module versions on Windows.
+*.tsv text eol=lf
+go.mod text eol=lf
+go.sum text eol=lf
+
 # Force LF on Go source + JSON golden fixtures so Windows checkouts
 # (with default core.autocrlf=true) don't trip byte-equal comparisons in
 # acceptance/contract envelope tests.
